@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Hello</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #282c36;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+
+        h1 {
+            font-size: 3em;
+            animation: fadeInScale 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes fadeInScale {
+            0% {
+                opacity: 0.5;
+                transform: scale(0.8);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Hello Everyone</h1>
+</body>
+</html>
