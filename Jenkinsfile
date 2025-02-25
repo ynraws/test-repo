@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'scalable' }
+    agent { label 'jenkins' }
 
     environment {
         GOOGLE_APPLICATION_CREDENTIALS = credentials('gcp-service-account')
