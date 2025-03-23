@@ -73,7 +73,7 @@ resource "google_container_node_pool" "primary_preemptible_nodes" {
   cluster        = google_container_cluster.primary.name
   location       = google_container_cluster.primary.location
   version        = var.K8s_version
-  node_locations = ["us-central1-a"]
+  node_locations = ["asia-south1-a"]
   node_count     = var.node-count
 
   node_config {
@@ -83,8 +83,8 @@ resource "google_container_node_pool" "primary_preemptible_nodes" {
     machine_type = "e2-medium"
   }
   autoscaling {
-    min_node_count = 1
-    max_node_count = 2
+    min_node_count = 2
+    max_node_count = 3
   }
   management {
     auto_repair  = true
