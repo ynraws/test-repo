@@ -25,5 +25,5 @@ variable "K8s_version" {
 variable "node-count" {
   description = "this is the gke node count"
   type        = number
-  default     = 1
+  default     = 2
 }
