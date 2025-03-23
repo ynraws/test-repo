@@ -78,13 +78,13 @@ resource "google_container_node_pool" "primary_preemptible_nodes" {
 
   node_config {
     image_type   = "UBUNTU_CONTAINERD"
-    disk_size_gb = "10"
+    disk_size_gb = "15"
     disk_type    = "pd-standard"
     machine_type = "e2-medium"
   }
   autoscaling {
-    min_node_count = 2
-    max_node_count = 3
+    min_node_count = 1
+    max_node_count = 2
   }
   management {
     auto_repair  = true
