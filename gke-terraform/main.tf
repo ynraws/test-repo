@@ -1,24 +1,19 @@
-resource "google_compute_network" "custom_vpc" {
+resource "google_compute_network" "custom_network" {
   name                    = "custom-vpc"
   auto_create_subnetworks = false
 }
 
-
-# SUBNET
-resource "google_compute_subnetwork" "custom_subnet" {
-  name          = "custom-subnet"
-  region        = "us-central1"
-  network       = google_compute_network.custom_vpc.id
+resource "google_compute_subnetwork" "custom-subnet" {
+  name          = "custom-subnetwork"
   ip_cidr_range = "10.10.0.0/16"
+  region        = var.region
+  network       = google_compute_network.custom_network.id
 }
 
-
-# FIREWALL RULES
-
-# Allow internal communication
+# Firewall-1 for Internal Communication
 resource "google_compute_firewall" "allow-internal" {
-  name    = "allow-internal"
-  network = google_compute_network.custom_vpc.id
+  name    = "internal-firewall"
+  network = google_compute_network.custom_network.id
 
   allow {
     protocol = "all"
@@ -27,10 +22,10 @@ resource "google_compute_firewall" "allow-internal" {
   source_ranges = ["10.10.0.0/16"]
 }
 
-# Allow external SSH, RDP, and ICMP
+# Firewall-2 for External Access SSH, icmp, RDP
 resource "google_compute_firewall" "allow-external" {
-  name    = "allow-external"
-  network = google_compute_network.custom_vpc.id
+  name    = "external-firewall"
+  network = google_compute_network.custom_network.id
 
   allow {
     protocol = "icmp"
@@ -44,10 +39,10 @@ resource "google_compute_firewall" "allow-external" {
   source_ranges = ["0.0.0.0/0"]
 }
 
-# Allow GKE communication
+# Firewall-3 for GKE Communication
 resource "google_compute_firewall" "allow-gke" {
-  name    = "allow-gke"
-  network = google_compute_network.custom_vpc.id
+  name    = "gke-firewall"
+  network = google_compute_network.custom_network.id
 
   allow {
     protocol = "tcp"
@@ -57,50 +52,42 @@ resource "google_compute_firewall" "allow-gke" {
   source_ranges = ["0.0.0.0/0"]
 }
 
-# GKE CLUSTER
+
+# GKE Cluster
 resource "google_container_cluster" "primary" {
   project  = var.project
-  name     = "my-gke-cluster"
-  location = "us-central1"
+  name     = "terraform-gke-cluster"
+  location = var.region
 
-  network    = google_compute_network.custom_vpc.id
-  subnetwork = google_compute_subnetwork.custom_subnet.id
-#  min_master_version = var.k8s_version
-  deletion_protection = false
-
+  network    = google_compute_network.custom_network.id
+  subnetwork = google_compute_subnetwork.custom-subnet.id
+  min_master_version = var.K8s_version
+  deletion_protection      = false
   remove_default_node_pool = true
-  initial_node_count       = 1
+  initial_node_count       = var.node-count
 }
 
-
-# NODE POOL
-resource "google_container_node_pool" "primary_nodes" {
-  name       = "my-node-pool"
-  project = google_container_cluster.primary.project
-  cluster = google_container_cluster.primary.name
-  location   = google_container_cluster.primary.location
-#  version = var.k8s_version
+resource "google_container_node_pool" "primary_preemptible_nodes" {
+  name           = "my-node-pool"
+  project        = google_container_cluster.primary.project
+  cluster        = google_container_cluster.primary.name
+  location       = google_container_cluster.primary.location
+  version        = var.K8s_version
   node_locations = ["us-central1-a"]
-  node_count = var.node_count
+  node_count     = var.node-count
 
-  #  node_count = var.node-count
   node_config {
     image_type   = "UBUNTU_CONTAINERD"
-    disk_size_gb = 10
-    disk_type = "pd-standard"
+    disk_size_gb = "10"
+    disk_type    = "pd-standard"
     machine_type = "e2-medium"
   }
   autoscaling {
-    min_node_count = 1
-    max_node_count = 2
+    min_node_count = 2
+    max_node_count = 3
   }
   management {
-    auto_repair = true
+    auto_repair  = true
     auto_upgrade = true
   }
 }
-
-
-# Scale the Cluster from 1 to 2 Nodes
-# If you prefer not to use Terraform for this change, you can scale the nodes manually:
-# gcloud container clusters resize my-gke-cluster --num-nodes=2 --region=us-central1
