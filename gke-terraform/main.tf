@@ -73,7 +73,7 @@ resource "google_container_node_pool" "primary_preemptible_nodes" {
   cluster        = google_container_cluster.primary.name
   location       = google_container_cluster.primary.location
   version        = var.K8s_version
-  node_locations = ["us-east11-a"]
+  node_locations = ["us-west1-a"]
   node_count     = var.node-count
 
   node_config {
