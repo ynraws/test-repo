@@ -7,13 +7,13 @@ variable "project" {
 variable "region" {
   description = "this is gcp region"
   type        = string
-  default     = "us-east1"
+  default     = "us-west1"
 }
 
 variable "zone" {
   description = "this is gcp zone"
   type        = string
-  default     = "us-east1-a"
+  default     = "us-west1-a"
 }
 
 variable "K8s_version" {
