@@ -1,7 +1,7 @@
 variable "project" {
   description = "this is gcp project-id"
   type        = string
-  default     = "my-second-project-450504"
+  default     = "argon-zoo-454615-t9"
 }
 
 variable "region" {
