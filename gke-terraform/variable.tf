@@ -1,7 +1,7 @@
 variable "project" {
   description = "this is gcp project-id"
   type        = string
-  default     = "rock-loop-449918-b0"
+  default     = "argon-zoo-454615-t9"
 }
 
 variable "region" {
